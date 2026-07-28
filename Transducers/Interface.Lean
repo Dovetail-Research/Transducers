@@ -9,7 +9,7 @@ open MeasureTheory ProbabilityTheory Kernel ENNReal Classical
 
 variable {A S O : Type} [MeasurableSpace A] [MeasurableSpace S] [MeasurableSpace O]
 
-/-- An "autoregressive-filter interface": for every length `n`, a Markov kernel turning an
+/-- For every length `n`, a Markov kernel turning an
 input word of length `n` into a distribution over output words of length `n`. -/
 abbrev AFInterface (A O : Type) [MeasurableSpace A] [MeasurableSpace O]
     := Π n, MarkovKernel (Fin n → A) (Fin n → O)
