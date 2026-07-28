@@ -50,9 +50,6 @@ def Transducer.κ := t.K 0
 -- This is the definition of what it means for a Transducer to be stationary.
 def Transducer.Stationary := ∀ i, t.K i = t.κ
 
-@[simp]
-lemma Transducer.Stationary.κ_eq {t : Transducer A S O} (ht : t.Stationary) : ∀ i, t.K i = t.κ := ht
-
 -- The next-state kernel obtained by marginalising the output out of `Transducer.κ`.
 def Transducer.κS : MarkovKernel (A × S) S :=
   ⟨t.κ.1.fst, inferInstance⟩
