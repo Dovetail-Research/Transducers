@@ -88,6 +88,7 @@ end Reduction
 
 /-
 TODO: `Transducer.traj_eq_of_reduction` (reductions preserve trajectories) was stated in terms of
-`Transducer.trajKernel` from `Transducers.Traj`, which has not yet been ported to the new
-definition of `Transducer`. Restore it (and the `import Transducers.Traj`) once `Traj` is updated.
+the old step-by-step `Transducer.trajKernel`, which no longer exists: `Transducers.Traj` now builds
+transducers from interfaces via Mathlib's `Kernel.traj`. A trajectory statement for reductions
+needs a notion of feeding states back along the order on `D` before it can be restated.
 -/
