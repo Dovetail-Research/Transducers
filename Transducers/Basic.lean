@@ -45,24 +45,27 @@ instance {α : Type u_1} {β : Type u_2} [MeasurableSpace α] [MeasurableSpace �
 
 @[ext] -- This auto-generates a lemma saying two transducers are equal iff their fields are.
 -- This structure is *the* definition of a Transducer.
+-- D: The index type over which actions, states and observations are indexed
 -- A: The alphabet of actions the Transducer can take
--- S: The state space of the Transducer
 -- O: The alphabet of observations the Transducer can make
+-- The state space `S` is no longer a parameter: it is an (implicit) field of the structure, so
+-- transducers with different state spaces but the same interface share a type.
 structure Transducer (D A O : Type) [MeasurableSpace A] [MeasurableSpace O] where
-  -- The kernel of a Transducer could technically be different on each time step. For almost all
-  -- use cases, we will want it to be stationary, and therefore have the same kernel on each time
-  -- step. We define this property below, and thus give the conventional name κ (kappa) to the
-  -- stationary kernel, and give a non-conventional name K (the roman letter) to the potentially
-  -- non-stationary kernel.
+  -- S: The state space of the Transducer
   {S : Type}
   [hS : MeasurableSpace S]
+  -- K: The kernel taking an action and a (current) state at each index to a (next) state and an
+  -- observation at each index.
   K : MarkovKernel (D → A × S) (D → S × O)
   p : Measure S -- This p is the initial probability distribution.
   hp : IsProbabilityMeasure p := by infer_instance
 
 -- This variable block just means that for the rest of this file, if we say `t` it's implied that
--- `t` should be a Transducer (with relevant types A(ction) S(tate) and O(bservations)).
+-- `t` should be a Transducer (with relevant types (in)D(ex), A(ction) and O(bservations)).
 variable {D A O : Type} [MeasurableSpace A] [MeasurableSpace O]
   (t : Transducer D A O)
+
+-- Let typeclass search find the measurable space on the state space `t.S` of a Transducer.
+attribute [instance] Transducer.hS
 
 attribute [instance] Transducer.hp
