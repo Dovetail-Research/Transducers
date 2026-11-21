@@ -48,34 +48,21 @@ instance {α : Type u_1} {β : Type u_2} [MeasurableSpace α] [MeasurableSpace �
 -- A: The alphabet of actions the Transducer can take
 -- S: The state space of the Transducer
 -- O: The alphabet of observations the Transducer can make
-structure Transducer (A S O : Type) [MeasurableSpace A] [MeasurableSpace S] [MeasurableSpace O] where
+structure Transducer (D A O : Type) [MeasurableSpace A] [MeasurableSpace O] where
   -- The kernel of a Transducer could technically be different on each time step. For almost all
   -- use cases, we will want it to be stationary, and therefore have the same kernel on each time
   -- step. We define this property below, and thus give the conventional name κ (kappa) to the
   -- stationary kernel, and give a non-conventional name K (the roman letter) to the potentially
   -- non-stationary kernel.
-  K : ℕ → MarkovKernel (A × S) (S × O)
+  {S : Type}
+  [hS : MeasurableSpace S]
+  K : MarkovKernel (D → A × S) (D → S × O)
   p : Measure S -- This p is the initial probability distribution.
   hp : IsProbabilityMeasure p := by infer_instance
 
 -- This variable block just means that for the rest of this file, if we say `t` it's implied that
 -- `t` should be a Transducer (with relevant types A(ction) S(tate) and O(bservations)).
-variable {A S O : Type} [MeasurableSpace A] [MeasurableSpace S] [MeasurableSpace O]
-  (t : Transducer A S O)
+variable {D A O : Type} [MeasurableSpace A] [MeasurableSpace O]
+  (t : Transducer D A O)
 
-instance {t : Transducer A S O} : IsProbabilityMeasure t.p := t.hp
-
--- Because we expect to use mostly stationary Transducers, we give the more conventional name κ
--- (kappa) to the kernel at time 0.
-def Transducer.κ := t.K 0
-
--- This is the definition of what it means for a Transducer to be stationary.
-def Transducer.Stationary := ∀ i, t.K i = t.κ
-
--- The next-state kernel obtained by marginalising the output out of `Transducer.κ`.
-def Transducer.κS : MarkovKernel (A × S) S :=
-  t.κ.1.fst
-
--- The output kernel obtained by marginalising the next state out of `Transducer.κ`.
-def Transducer.κO : MarkovKernel (A × S) O :=
-  t.κ.1.snd
+attribute [instance] Transducer.hp

@@ -24,7 +24,7 @@ reached after `n` steps together with the length-`n` output word.
 Built by induction on `n`: `trajKernel (n + 1)` runs `trajKernel n` on the length-`n`
 prefix of the input, then appends one more step via `t.K n` fed by the last input
 symbol and the state reached so far. -/
-noncomputable def Transducer.trajKernel (t : Transducer A S O) :
+noncomputable def Transducer.trajKernel (t : Transducer A S O) [Nonempty t.S] :
     Π n, MarkovKernel ((Fin n → A) × S) (S × (Fin n → O))
   | 0 =>
     ⟨Kernel.deterministic (fun sa => (sa.2, Fin.elim0)) (by fun_prop), inferInstance⟩
@@ -118,11 +118,10 @@ lemma Transducer.trajProb_formula (t : Transducer A S O) {n : ℕ}
       Nat.reduceAdd, Fin.isValue, Finset.univ_eq_empty, Finset.prod_empty]
     split_ifs with h
     · simp only [Set.mem_singleton_iff, Prod.mk.injEq] at h
-      have : ENat.card (Subtype fun (s : Fin 1 → S) ↦ s 0 = sf) = 1 := by
-        rw [ENat.card_eq_one_iff_unique]
-        refine ⟨⟨⟨fun _ ↦ sf, rfl⟩, fun x ↦ ?_⟩⟩
-        ext _
-        simp [Fin.eq_zero _, x.2]
+      have : {s : Fin 1 → S | s 0 = sf}.encard = 1 := by
+        rw [Set.encard_eq_one]
+        refine ⟨fun _ ↦ sf, Set.ext fun x ↦ ?_⟩
+        simp [funext_iff, Fin.forall_fin_one]
       simp [this, h]
     · simp only [Subsingleton.allEq Fin.elim0 o, Set.mem_singleton_iff, Prod.mk.injEq,
         and_true] at h
@@ -143,10 +142,10 @@ lemma Transducer.trajProb_formula (t : Transducer A S O) {n : ℕ}
       rw [tsum_subtype (f := fun (s : Fin (n + 1) → S) ↦
         (∏ (i : Fin n), (t.K i) (Fin.init a i, s i.castSucc) {(s i.succ, Fin.init o i)}))]
       tactic => simp_rw [← ENNReal.tsum_mul_right, @eq_comm _ _ s]
-    rw [← (Fin.snocEquiv _).tsum_eq, ENNReal.tsum_prod', ENNReal.tsum_comm]
-    simp only [Set.indicator, and_comm, Set.mem_setOf_eq, ite_and, ite_mul, zero_mul, tsum_ite_eq,
+    rw [← (Fin.snocEquiv _).tsum_eq, tsum_prod', tsum_comm]
+    simp only [Set.indicator, and_comm, Set.mem_ofPred_eq, ite_and, ite_mul, zero_mul, tsum_ite_eq,
       Fin.snocEquiv_apply, Fin.snoc_last, Fin.snoc_apply_zero, Fin.val_castSucc, Fin.snoc_castSucc,
-      Fin.val_last, Fin.succ_last, Nat.succ_eq_add_one, ENNReal.tsum_comm]
+      Fin.val_last, Fin.succ_last, Nat.succ_eq_add_one, tsum_comm]
     congr with s
     congr with i
     congr
@@ -160,7 +159,7 @@ theorem Transducer.statesless_formula (t : Transducer A S O) {n : ℕ}
       t.p {s 0} * ∏ i : Fin n, t.K i (a i, s i.castSucc) {(s i.succ, o i)} := by
     simp only [stateless_traj]
     rw [snd_apply', comp_apply', lintegral_prod, lintegral_id', Kernel.lintegral_const,
-      lintegral_countable', ← (Fin.consEquiv _).tsum_eq, ENNReal.tsum_prod']
+      lintegral_countable', ← (Fin.consEquiv _).tsum_eq, tsum_prod']
     apply tsum_congr
     intro s
     simp only [Fin.consEquiv_apply, Fin.cons_zero, Fin.cons_succ, mul_comm, ENNReal.tsum_mul_left]
@@ -169,12 +168,12 @@ theorem Transducer.statesless_formula (t : Transducer A S O) {n : ℕ}
     · simp_rw [trajProb_formula]
       simp_rw [tsum_subtype _ (fun (q : Fin (n + 1) → S) ↦
         ∏ (i : Fin n), t.K i (a i, q i.castSucc) {(q i.succ, o i)})]
-      rw [ENNReal.tsum_comm, ← (Fin.consEquiv _).tsum_eq, ENNReal.tsum_prod', ENNReal.tsum_comm]
+      rw [tsum_comm, ← (Fin.consEquiv _).tsum_eq, tsum_prod', tsum_comm]
       apply tsum_congr
       intro q
-      simp [Set.indicator_apply, ite_and, ENNReal.tsum_comm]
+      simp [Set.indicator_apply, ite_and, tsum_comm]
     · intro i j hij t u v q hq
-      simp only [Set.le_eq_subset, Set.subset_singleton_iff] at u v
+      simp only [Set.subset_singleton_iff] at u v
       grind
     · exact fun _ ↦ measurableSet_singleton _
     apply Measurable.lintegral_prod_right
