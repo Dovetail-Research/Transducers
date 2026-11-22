@@ -1,5 +1,6 @@
 import Transducers.Traj
 import Transducers.AnticipationFree
+import Transducers.Hom
 
 /-!
 # Interfaces
@@ -19,6 +20,7 @@ with the observations at times `0, …, n - 1`.
 
 * `Interface.toTransducer`: the transducer built from an interface with `Kernel.traj`.
 * `Interface.anticipationFree_toTransducer`: this transducer is anticipation-free.
+* `Interface.isMin_toTransducer`: this transducer is minimal for reduction.
 -/
 
 open MeasureTheory ProbabilityTheory Finset Preorder ProbabilityTheory.Kernel
@@ -162,5 +164,12 @@ lemma trajKernel_map_restrictIic (d : ℕ) (x y : ℕ → A × Unit) (hxy : ∀ 
 /-- The transducer induced by an interface is anticipation-free. -/
 theorem anticipationFree_toTransducer : I.toTransducer.AnticipationFree :=
   fun d x y hxy ↦ I.trajKernel_map_restrictIic d x y fun e he ↦ congrFun hxy ⟨e, he⟩
+
+/-- The transducer induced by an interface is minimal for reduction: since its state space has a
+single element, every reduction of it is equivalent to it. -/
+theorem isMin_toTransducer [I.toTransducer.Regular] :
+    IsMin (α := RegularTransducer ℕ A O) ⟨I.toTransducer, inferInstance⟩ :=
+  have : Subsingleton I.toTransducer.S := inferInstanceAs (Subsingleton Unit)
+  RegularTransducer.isMin_of_subsingleton _
 
 end Interface
