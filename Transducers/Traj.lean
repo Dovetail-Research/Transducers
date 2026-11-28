@@ -23,12 +23,12 @@ noncomputable section
 
 namespace ProbabilityTheory.Kernel
 
-variable {X : ℕ → Type*} [∀ n, MeasurableSpace (X n)]
+variable {X : ℕ → Type*} [(n : ℕ) → MeasurableSpace (X n)]
   {κ : (n : ℕ) → Kernel (Π i : Iic n, X i) (X (n + 1))} [∀ n, IsMarkovKernel (κ n)]
-  {F : ∀ n, X n → X n}
+  {F : (n : ℕ) → X n → X n}
 
 /-- Apply the family of maps `F` coordinatewise to a partial trajectory. -/
-def coordMap (F : ∀ n, X n → X n) {I : Finset ℕ} (z : Π i : I, X i) : Π i : I, X i :=
+def coordMap (F : (n : ℕ) → X n → X n) {I : Finset ℕ} (z : Π i : I, X i) : Π i : I, X i :=
   fun i ↦ F i (z i)
 
 lemma measurable_coordMap (hF : ∀ n, Measurable (F n)) {I : Finset ℕ} :

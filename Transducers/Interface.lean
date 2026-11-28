@@ -99,7 +99,7 @@ lemma obsKernel_map_restrictIic (d : ℕ) (x y : ℕ → A) (hxy : ∀ e ≤ d, 
     by_cases hi : i ≤ d
     · simpa [τ, hi] using measurable_pi_apply i
     · simp [τ, hi]
-  let F : ∀ n : ℕ, (ℕ → A) × (Fin n → O) → (ℕ → A) × (Fin n → O) := fun _ ↦ Prod.map τ id
+  let F : (n : ℕ) → (ℕ → A) × (Fin n → O) → (ℕ → A) × (Fin n → O) := fun _ ↦ Prod.map τ id
   have hF : ∀ n, Measurable (F n) := fun _ ↦ hτ.prodMap measurable_id
   -- The step kernels up to time `d` commute with `F`.
   have hstep : ∀ n < d + 1, (I.step n).comap (coordMap F) (measurable_coordMap hF) =

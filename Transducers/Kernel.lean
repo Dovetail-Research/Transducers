@@ -4,7 +4,7 @@ import Mathlib.Probability.Kernel.Composition.Prod
 /-!
 # Kernels
 
-Helpers for Markov kernels, restrictions of `D`-indexed families to the past and future of an
+Helpers for Markov kernels, restrictions of `T`-indexed families to the past and future of an
 index (and gluing them back together), two lemmas on maps of kernels and composition-products,
 and the causal-Markov property of a kernel.
 -/
@@ -54,30 +54,30 @@ instance {α : Type u_1} {β : Type u_2} [MeasurableSpace α] [MeasurableSpace �
     ⟨k, hk⟩
   ⟩
 
-/-- Restrict a `D`-indexed family to the indices `e ≤ d`. -/
-def restrictIic {D β : Type} [Preorder D] (d : D) (x : D → β) : Set.Iic d → β :=
+/-- Restrict a `T`-indexed family to the indices `e ≤ d`. -/
+def restrictIic {T β : Type} [Preorder T] (d : T) (x : T → β) : Set.Iic d → β :=
   fun e ↦ x e
 
-/-- Restrict a `D`-indexed family to the indices `e > d`. -/
-def restrictIoi {D β : Type} [Preorder D] (d : D) (x : D → β) : Set.Ioi d → β :=
+/-- Restrict a `T`-indexed family to the indices `e > d`. -/
+def restrictIoi {T β : Type} [Preorder T] (d : T) (x : T → β) : Set.Ioi d → β :=
   fun e ↦ x e
 
 @[fun_prop]
-lemma measurable_restrictIic {D β : Type} [Preorder D] [MeasurableSpace β] (d : D) :
+lemma measurable_restrictIic {T β : Type} [Preorder T] [MeasurableSpace β] (d : T) :
     Measurable (restrictIic (β := β) d) := by
   unfold restrictIic
   fun_prop
 
 @[fun_prop]
-lemma measurable_restrictIoi {D β : Type} [Preorder D] [MeasurableSpace β] (d : D) :
+lemma measurable_restrictIoi {T β : Type} [Preorder T] [MeasurableSpace β] (d : T) :
     Measurable (restrictIoi (β := β) d) := by
   unfold restrictIoi
   fun_prop
 
-/-- Split a `D`-indexed family at `d` into its past (indices `≤ d`) and its future
+/-- Split a `T`-indexed family at `d` into its past (indices `≤ d`) and its future
 (indices `> d`). -/
-def splitIicIoi {D β : Type} [LinearOrder D] [MeasurableSpace β] (d : D) :
-    (D → β) ≃ᵐ (Set.Iic d → β) × (Set.Ioi d → β) where
+def splitIicIoi {T β : Type} [LinearOrder T] [MeasurableSpace β] (d : T) :
+    (T → β) ≃ᵐ (Set.Iic d → β) × (Set.Ioi d → β) where
   toFun y := (restrictIic d y, restrictIoi d y)
   invFun p e := if h : e ≤ d then p.1 ⟨e, h⟩ else p.2 ⟨e, not_le.1 h⟩
   left_inv y := funext fun e ↦ by
@@ -92,43 +92,43 @@ def splitIicIoi {D β : Type} [LinearOrder D] [MeasurableSpace β] (d : D) :
     split_ifs <;> fun_prop
 
 @[simp]
-lemma splitIicIoi_apply {D β : Type} [LinearOrder D] [MeasurableSpace β] (d : D) (y : D → β) :
+lemma splitIicIoi_apply {T β : Type} [LinearOrder T] [MeasurableSpace β] (d : T) (y : T → β) :
     splitIicIoi d y = (restrictIic d y, restrictIoi d y) :=
   rfl
 
 @[fun_prop]
-lemma measurable_splitIicIoi_symm {D β : Type} [LinearOrder D] [MeasurableSpace β] (d : D) :
+lemma measurable_splitIicIoi_symm {T β : Type} [LinearOrder T] [MeasurableSpace β] (d : T) :
     Measurable (splitIicIoi (β := β) d).symm :=
   (splitIicIoi d).symm.measurable
 
 /-- Gluing a past and a future: the inverse of `splitIicIoi d`. -/
-lemma splitIicIoi_symm_apply {D β : Type} [LinearOrder D] [MeasurableSpace β] (d : D)
-    (p : (Set.Iic d → β) × (Set.Ioi d → β)) (e : D) :
+lemma splitIicIoi_symm_apply {T β : Type} [LinearOrder T] [MeasurableSpace β] (d : T)
+    (p : (Set.Iic d → β) × (Set.Ioi d → β)) (e : T) :
     (splitIicIoi d).symm p e = if h : e ≤ d then p.1 ⟨e, h⟩ else p.2 ⟨e, not_le.1 h⟩ :=
   rfl
 
 @[simp]
-lemma restrictIic_splitIicIoi_symm {D β : Type} [LinearOrder D] [MeasurableSpace β] (d : D)
+lemma restrictIic_splitIicIoi_symm {T β : Type} [LinearOrder T] [MeasurableSpace β] (d : T)
     (p : (Set.Iic d → β) × (Set.Ioi d → β)) : restrictIic d ((splitIicIoi d).symm p) = p.1 :=
   congrArg Prod.fst ((splitIicIoi d).apply_symm_apply p)
 
 @[simp]
-lemma restrictIoi_splitIicIoi_symm {D β : Type} [LinearOrder D] [MeasurableSpace β] (d : D)
+lemma restrictIoi_splitIicIoi_symm {T β : Type} [LinearOrder T] [MeasurableSpace β] (d : T)
     (p : (Set.Iic d → β) × (Set.Ioi d → β)) : restrictIoi d ((splitIicIoi d).symm p) = p.2 :=
   congrArg Prod.snd ((splitIicIoi d).apply_symm_apply p)
 
 @[simp]
-lemma splitIicIoi_symm_restrict {D β : Type} [LinearOrder D] [MeasurableSpace β] (d : D)
-    (x : D → β) : (splitIicIoi d).symm (restrictIic d x, restrictIoi d x) = x :=
+lemma splitIicIoi_symm_restrict {T β : Type} [LinearOrder T] [MeasurableSpace β] (d : T)
+    (x : T → β) : (splitIicIoi d).symm (restrictIic d x, restrictIoi d x) = x :=
   (splitIicIoi d).symm_apply_apply x
 
 /-- Follow `x` up to index `d`, and `y` after `d`. -/
-def padAfter {D β : Type} [LinearOrder D] (d : D) (x y : D → β) : D → β :=
+def padAfter {T β : Type} [LinearOrder T] (d : T) (x y : T → β) : T → β :=
   fun e ↦ if e ≤ d then x e else y e
 
 @[fun_prop]
-lemma measurable_padAfter {D α β : Type} [LinearOrder D] [MeasurableSpace α] [MeasurableSpace β]
-    {f g : α → D → β} (d : D) (hf : Measurable f) (hg : Measurable g) :
+lemma measurable_padAfter {T α β : Type} [LinearOrder T] [MeasurableSpace α] [MeasurableSpace β]
+    {f g : α → T → β} (d : T) (hf : Measurable f) (hg : Measurable g) :
     Measurable fun x ↦ padAfter d (f x) (g x) :=
   Measurable.of_eval fun e ↦ by
     unfold padAfter
@@ -137,12 +137,12 @@ lemma measurable_padAfter {D α β : Type} [LinearOrder D] [MeasurableSpace α] 
     · exact (measurable_pi_apply e).comp hg
 
 @[simp]
-lemma restrictIic_padAfter {D β : Type} [LinearOrder D] (d : D) (x y : D → β) :
+lemma restrictIic_padAfter {T β : Type} [LinearOrder T] (d : T) (x y : T → β) :
     restrictIic d (padAfter d x y) = restrictIic d x :=
   funext fun e ↦ if_pos (Set.mem_Iic.1 e.2)
 
 @[simp]
-lemma restrictIoi_padAfter {D β : Type} [LinearOrder D] (d : D) (x y : D → β) :
+lemma restrictIoi_padAfter {T β : Type} [LinearOrder T] (d : T) (x y : T → β) :
     restrictIoi d (padAfter d x y) = restrictIoi d y :=
   funext fun e ↦ if_neg (not_le.2 (Set.mem_Ioi.1 e.2))
 
@@ -180,9 +180,9 @@ lemma MeasureTheory.Measure.map_compProd_eq {α β γ δ : Type} [MeasurableSpac
 
 In discrete time this says that each output only depends on the current state and action (see
 the paper's Definition 1); the formulation makes equal sense in continuous time. -/
-def ProbabilityTheory.Kernel.IsCausalMarkov {D A O S : Type} [LinearOrder D] [MeasurableSpace A]
-    [MeasurableSpace O] [MeasurableSpace S] (κ : Kernel (S × (D → A)) (D → S × O)) : Prop :=
-  ∀ d : D, ∃ (past : Kernel (S × (Set.Iic d → A)) (Set.Iic d → S × O))
+def ProbabilityTheory.Kernel.IsCausalMarkov {T A O S : Type} [LinearOrder T] [MeasurableSpace A]
+    [MeasurableSpace O] [MeasurableSpace S] (κ : Kernel (S × (T → A)) (T → S × O)) : Prop :=
+  ∀ d : T, ∃ (past : Kernel (S × (Set.Iic d → A)) (Set.Iic d → S × O))
     (future : Kernel (S × (Set.Ioi d → A)) (Set.Ioi d → S × O)),
     IsMarkovKernel past ∧ IsMarkovKernel future ∧ ∀ s a,
       (κ (s, a)).map (splitIicIoi d) =

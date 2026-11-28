@@ -12,12 +12,12 @@ import Transducers.AnticipationFree
 
 open MeasureTheory ProbabilityTheory Kernel
 
-variable {D A O A' O' : Type} [LinearOrder D] [MeasurableSpace A] [MeasurableSpace O]
+variable {T A O A' O' : Type} [LinearOrder T] [MeasurableSpace A] [MeasurableSpace O]
   [MeasurableSpace A'] [MeasurableSpace O']
 
 /-- Running `t'` from `φ s` on the translated actions gives the observations of `t` from `s`,
 pushed forward along `f`. -/
-theorem Transducer.Hom.obsKernel_comap {t : Transducer D A O} {t' : Transducer D A' O'}
+theorem Transducer.Hom.obsKernel_comap {t : Transducer T A O} {t' : Transducer T A' O'}
     (h : t.Hom t') (s : t.S) :
     (t'.obsKernel (h.φ s)).comap (fun a d ↦ h.g (a d)) (by fun_prop) =
       (t.obsKernel s).map (fun o d ↦ h.f (o d)) := by
@@ -29,7 +29,7 @@ theorem Transducer.Hom.obsKernel_comap {t : Transducer D A O} {t' : Transducer D
 
 /-- **Observation 1.** If `t'` is a reduction of `t`, then from every initial state `s`, `t` and
 `t'` started in the image of `s` have the same observation kernel (interface). -/
-theorem Transducer.IsReduction.obsKernel_eq {t t' : Transducer D A O} (h : t.IsReduction t')
+theorem Transducer.IsReduction.obsKernel_eq {t t' : Transducer T A O} (h : t.IsReduction t')
     (s : t.S) : t'.obsKernel (h.reduction.φ s) = t.obsKernel s := by
   have := h.reduction.obsKernel_comap s
   simp only [h.reduction_spec.2.1, h.reduction_spec.2.2, id_eq] at this
