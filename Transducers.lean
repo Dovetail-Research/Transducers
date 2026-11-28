@@ -1,1 +1,3 @@
 import Transducers.Transducer
+import Transducers.Predictive.Basic
+import Transducers.Predictive.EpsilonMinimal
